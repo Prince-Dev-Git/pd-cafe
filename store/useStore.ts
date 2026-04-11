@@ -27,13 +27,14 @@ export const useStore = create<AppState>((set) => ({
       return {
         cart: state.cart.map((c) => 
           c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
-        )
+        ),
         isCartOpen: true // <-- Automatically open the drawer!
       };
     }
 
-    return { cart: [...state.cart, { ...item, quantity: 1 }] };
-    isCartOpen: true // <-- Automatically open the drawer!
+    return { cart: [...state.cart, { ...item, quantity: 1 }],
+ isCartOpen: true
+};
   }),
 
   removeFromCart: (id) => set((state) => ({
