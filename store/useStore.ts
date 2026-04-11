@@ -19,6 +19,7 @@ interface AppState {
 export const useStore = create<AppState>((set) => ({
   cart: [],
   isCartOpen: false,
+  
   toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
   
   addToCart: (item) => set((state) => {
@@ -28,13 +29,13 @@ export const useStore = create<AppState>((set) => ({
         cart: state.cart.map((c) => 
           c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
         ),
-        isCartOpen: true // <-- Automatically open the drawer!
+        isCartOpen: true 
       };
     }
-
-    return { cart: [...state.cart, { ...item, quantity: 1 }],
- isCartOpen: true
-};
+    return { 
+      cart: [...state.cart, { ...item, quantity: 1 }],
+      isCartOpen: true 
+    };
   }),
 
   removeFromCart: (id) => set((state) => ({
