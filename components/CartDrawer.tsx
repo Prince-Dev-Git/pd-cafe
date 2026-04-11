@@ -7,26 +7,31 @@ import { useStore } from '@/store/useStore';
 export default function CartDrawer() {
   const { cart, isCartOpen, toggleCart, updateQuantity, removeFromCart } = useStore();
 
-  // Calculate the total order value
   const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.08; // 8% tax simulation
+  const tax = subtotal * 0.08;
   const total = subtotal + tax;
 
   return (
-    <AnimatePresence>
-      {isCartOpen && (
-        <>
-          {/* Dark Background Overlay */}
+    <>
+      {/* 1. Dark Background Overlay */}
+      <AnimatePresence>
+        {isCartOpen && (
           <motion.div 
+            key="cart-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 cursor-pointer"
+            className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-40 cursor-pointer"
           />
+        )}
+      </AnimatePresence>
 
-          {/* Slide-out Drawer */}
+      {/* 2. Slide-out Drawer */}
+      <AnimatePresence>
+        {isCartOpen && (
           <motion.div 
+            key="cart-drawer"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -36,10 +41,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-slate-700">
               <h2 className="text-2xl font-serif text-gold-500">Your Order</h2>
-              <button 
-                onClick={toggleCart}
-                className="text-slate-400 hover:text-gold-500 transition-colors p-2"
-              >
+              <button onClick={toggleCart} className="text-slate-400 hover:text-gold-500 transition-colors p-2">
                 <X size={24} />
               </button>
             </div>
@@ -72,10 +74,7 @@ export default function CartDrawer() {
                       </button>
                     </div>
 
-                    <button 
-                      onClick={() => removeFromCart(item.id)}
-                      className="ml-4 text-slate-500 hover:text-red-400 transition-colors"
-                    >
+                    <button onClick={() => removeFromCart(item.id)} className="ml-4 text-slate-500 hover:text-red-400 transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -105,8 +104,8 @@ export default function CartDrawer() {
               </div>
             )}
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
