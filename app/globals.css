@@ -1,22 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-luxury-gold: #d4af37;
+  --color-luxury-slate: #1e293b;
+  --color-luxury-accent: #f1f5f9;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #1e293b; /* Slate Background */
+  --foreground: #f1f5f9; /* Light Text */
 }
 
 body {
