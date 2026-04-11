@@ -5,72 +5,62 @@ import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 
 export default function CartDrawer() {
-  // THE FIX: Prevent Hydration Mismatch
   const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => { setIsMounted(true); }, []);
 
   const { cart, isCartOpen, toggleCart, updateQuantity, removeFromCart } = useStore();
 
-  // If the component hasn't mounted in the browser yet, OR the cart is closed, render nothing.
-  if (!isMounted) return null;
-  if (!isCartOpen) return null;
+  if (!isMounted || !isCartOpen) return null;
 
   const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
   const total = subtotal + tax;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex justify-end">
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99999, display: 'flex', justifyContent: 'flex-end' }}>
       
-      {/* Dark Background Overlay */}
+      {/* Dark Overlay - Hardcoded RGBA so it CANNOT be invisible */}
       <div 
-        className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm cursor-pointer"
         onClick={toggleCart}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.85)', cursor: 'pointer' }}
       />
 
-      {/* The Drawer Panel */}
-      <div className="relative w-full sm:w-[450px] h-full bg-slate-800 border-l border-slate-700 shadow-2xl flex flex-col z-[10000]">
+      {/* Drawer Panel - Hardcoded layout and colors */}
+      <div style={{ position: 'relative', width: '100%', maxWidth: '450px', height: '100%', backgroundColor: '#1e293b', borderLeft: '1px solid #334155', display: 'flex', flexDirection: 'column', zIndex: 100000, boxShadow: '-10px 0 25px rgba(0,0,0,0.5)' }}>
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-slate-700 bg-slate-900">
-          <h2 className="text-2xl font-serif text-gold-500 tracking-wider">Your Order</h2>
-          <button onClick={toggleCart} className="text-slate-400 hover:text-gold-500 transition-colors p-2 rounded-full hover:bg-slate-800">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid #334155', backgroundColor: '#0f172a' }}>
+          <h2 style={{ fontSize: '1.5rem', fontFamily: 'serif', color: '#d4af37', letterSpacing: '0.05em', margin: 0 }}>Your Order</h2>
+          <button onClick={toggleCart} style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
             <X size={24} />
           </button>
         </div>
 
         {/* Cart Items Area */}
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4">
-              <p className="text-lg">Your cart is empty.</p>
-              <button onClick={toggleCart} className="text-gold-500 hover:underline">
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', gap: '1rem' }}>
+              <p style={{ fontSize: '1.125rem', margin: 0 }}>Your cart is empty.</p>
+              <button onClick={toggleCart} style={{ color: '#d4af37', textDecoration: 'underline', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>
                 Continue browsing
               </button>
             </div>
           ) : (
             cart.map((item) => (
-              <div key={item.id} className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-700 shadow-sm">
-                <div className="flex-1 pr-4">
-                  <h3 className="text-slate-100 font-medium truncate">{item.name}</h3>
-                  <p className="text-gold-500 font-serif">${item.price}</p>
+              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #334155' }}>
+                <div style={{ flex: 1, paddingRight: '1rem' }}>
+                  <h3 style={{ color: '#f1f5f9', fontWeight: 500, margin: '0 0 0.25rem 0', fontSize: '1.125rem' }}>{item.name}</h3>
+                  <p style={{ color: '#d4af37', fontFamily: 'serif', margin: 0, fontSize: '1rem' }}>${item.price}</p>
                 </div>
                 
                 {/* Quantity Controls */}
-                <div className="flex items-center gap-3 bg-slate-800 rounded-full px-3 py-1.5 border border-slate-600">
-                  <button onClick={() => updateQuantity(item.id, 'decrement')} className="text-slate-400 hover:text-gold-500 transition-colors">
-                    <Minus size={14} />
-                  </button>
-                  <span className="text-slate-100 w-5 text-center text-sm font-medium">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, 'increment')} className="text-slate-400 hover:text-gold-500 transition-colors">
-                    <Plus size={14} />
-                  </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: '#1e293b', borderRadius: '9999px', padding: '0.375rem 0.75rem', border: '1px solid #475569' }}>
+                  <button onClick={() => updateQuantity(item.id, 'decrement')} style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex' }}><Minus size={14} /></button>
+                  <span style={{ color: '#f1f5f9', width: '1.25rem', textAlign: 'center', fontSize: '0.875rem' }}>{item.quantity}</span>
+                  <button onClick={() => updateQuantity(item.id, 'increment')} style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex' }}><Plus size={14} /></button>
                 </div>
 
-                <button onClick={() => removeFromCart(item.id)} className="ml-4 text-slate-500 hover:text-red-400 transition-colors p-2">
+                <button onClick={() => removeFromCart(item.id)} style={{ marginLeft: '1rem', color: '#64748b', background: 'transparent', border: 'none', cursor: 'pointer' }}>
                   <Trash2 size={18} />
                 </button>
               </div>
@@ -80,21 +70,18 @@ export default function CartDrawer() {
 
         {/* Checkout Footer */}
         {cart.length > 0 && (
-          <div className="p-6 bg-slate-900 border-t border-slate-700 space-y-3 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]">
-            <div className="flex justify-between text-slate-400 text-sm">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+          <div style={{ padding: '1.5rem', backgroundColor: '#0f172a', borderTop: '1px solid #334155' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+              <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-slate-400 text-sm">
-              <span>Estimated Tax (8%)</span>
-              <span>${tax.toFixed(2)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              <span>Estimated Tax (8%)</span><span>${tax.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-gold-500 text-xl font-serif pt-4 border-t border-slate-800 mt-2">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d4af37', fontSize: '1.25rem', fontFamily: 'serif', paddingTop: '1rem', borderTop: '1px solid #1e293b' }}>
+              <span>Total</span><span>${total.toFixed(2)}</span>
             </div>
             
-            <button className="w-full bg-gold-500 hover:bg-gold-400 text-slate-900 font-bold py-4 rounded-lg transition-all duration-300 uppercase tracking-widest mt-6 shadow-lg shadow-gold-500/20 hover:shadow-gold-500/40">
+            <button style={{ width: '100%', backgroundColor: '#d4af37', color: '#0f172a', fontWeight: 'bold', padding: '1rem', borderRadius: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '1.5rem', border: 'none', cursor: 'pointer' }}>
               Proceed to Checkout
             </button>
           </div>
