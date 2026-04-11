@@ -1,12 +1,21 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 
 export default function CartDrawer() {
+  // THE FIX: Prevent Hydration Mismatch
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const { cart, isCartOpen, toggleCart, updateQuantity, removeFromCart } = useStore();
 
-  // If the state says it's closed, render absolutely nothing.
+  // If the component hasn't mounted in the browser yet, OR the cart is closed, render nothing.
+  if (!isMounted) return null;
   if (!isCartOpen) return null;
 
   const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
