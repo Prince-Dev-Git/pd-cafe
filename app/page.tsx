@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Menu from '@/components/Menu';
+import Contact from '@/components/Contact';
 import Chatbot from '@/components/Chatbot';
+import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
   title: 'PD Cafe | Luxury Dining',
@@ -15,7 +17,9 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Menu />
+      <Contact />
       <Chatbot />
+      <CartDrawer />
     </main>
   );
 }
