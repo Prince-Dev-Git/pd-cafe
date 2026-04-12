@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { Calendar, Clock, Users, Phone, User, MessageSquare } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Calendar, Clock, Users, Phone, User, MessageSquare, Mail } from 'lucide-react';
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Form State
+  // 1. Added Refs to control the native pickers
+  const dateRef = useRef<HTMLInputElement>(null);
+  const timeRef = useRef<HTMLInputElement>(null);
+
+  // 2. Added email to Form State
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
     date: '',
     time: '',
@@ -24,13 +29,13 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Replace YOUR_GOOGLE_FORM_ID with your actual Form ID
+ // Replace YOUR_GOOGLE_FORM_ID with your actual Form ID
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSczqZ0SjqHfsT-NGroBSDjOZEuvCoM4Izp6bpHPAaK5L4p1Hw/formResponse';
     
     // Map our React state to the specific Google Form entry IDs
     const formBody = new URLSearchParams();
     formBody.append('entry.1324918526', formData.name); // Replace with your Name Field ID
+    formBody.append('entry.384536288', formData.email); 
     formBody.append('entry.384536288', formData.phone); // Exact Phone Field ID mapped
     formBody.append('entry.214699220', formData.date); // Replace with your Date Field ID
     formBody.append('entry.411635861', formData.time); // Replace with your Time Field ID
@@ -41,17 +46,15 @@ export default function Contact() {
       await fetch(GOOGLE_FORM_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formBody.toString(),
       });
       
       setIsSuccess(true);
-      setFormData({ name: '', phone: '', date: '', time: '', guests: '2', requests: '' });
+      // Reset state including email
+      setFormData({ name: '', email: '', phone: '', date: '', time: '', guests: '2', requests: '' });
     } catch (error) {
       console.error('Submission failed', error);
-      // Fallback error handling could go here
     } finally {
       setIsSubmitting(false);
     }
@@ -87,8 +90,8 @@ export default function Contact() {
         {/* Right Column: The Booking Form */}
         <div className="bg-slate-800/50 p-8 md:p-10 rounded-2xl border border-slate-700 shadow-xl relative overflow-hidden">
           
-          {isSuccess ? (
-            <div className="absolute inset-0 bg-slate-800/95 backdrop-blur-sm flex flex-col items-center justify-center text-center p-8 z-10 animate-in fade-in duration-500">
+          {isSuccess && (
+            <div className="absolute inset-0 bg-slate-800/95 backdrop-blur-sm flex flex-col items-center justify-center text-center p-8 z-20 animate-in fade-in duration-500">
               <div className="w-16 h-16 bg-gold-500/20 text-gold-500 rounded-full flex items-center justify-center mb-6">
                 <Calendar size={32} />
               </div>
@@ -103,11 +106,12 @@ export default function Contact() {
                 Make Another Reservation
               </button>
             </div>
-          ) : null}
+          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            
+            {/* ROW 1: Contact Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name */}
               <div className="space-y-2">
                 <label className="text-xs tracking-wider text-slate-400 uppercase">Full Name</label>
                 <div className="relative">
@@ -115,7 +119,6 @@ export default function Contact() {
                   <input required type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors" placeholder="John Doe" />
                 </div>
               </div>
-              {/* Phone */}
               <div className="space-y-2">
                 <label className="text-xs tracking-wider text-slate-400 uppercase">Phone Number</label>
                 <div className="relative">
@@ -125,28 +128,69 @@ export default function Contact() {
               </div>
             </div>
 
+            {/* Email Field on its own line for better spacing */}
+            <div className="space-y-2">
+              <label className="text-xs tracking-wider text-slate-400 uppercase">Email Address</label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors" placeholder="john@example.com" />
+              </div>
+            </div>
+
+            {/* ROW 2: Booking Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Date */}
+              
+              {/* Date with Custom onClick Trigger */}
               <div className="space-y-2">
                 <label className="text-xs tracking-wider text-slate-400 uppercase">Date</label>
-                <div className="relative">
-                  <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
-                  <input required type="date" name="date" value={formData.date} onChange={handleChange} className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
+                <div 
+                  className="relative cursor-pointer" 
+                  onClick={() => {
+                    try { dateRef.current?.showPicker(); } catch (e) { dateRef.current?.focus(); }
+                  }}
+                >
+                  <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                  <input 
+                    ref={dateRef}
+                    required 
+                    type="date" 
+                    name="date" 
+                    value={formData.date} 
+                    onChange={handleChange} 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  />
                 </div>
               </div>
-              {/* Time */}
+
+              {/* Time with Custom onClick Trigger */}
               <div className="space-y-2">
                 <label className="text-xs tracking-wider text-slate-400 uppercase">Time</label>
-                <div className="relative">
-                  <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
-                  <input required type="time" name="time" value={formData.time} onChange={handleChange} min="17:00" max="23:00" className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer" />
+                <div 
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    try { timeRef.current?.showPicker(); } catch (e) { timeRef.current?.focus(); }
+                  }}
+                >
+                  <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                  <input 
+                    ref={timeRef}
+                    required 
+                    type="time" 
+                    name="time" 
+                    value={formData.time} 
+                    onChange={handleChange} 
+                    min="17:00" 
+                    max="23:00" 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                  />
                 </div>
               </div>
+
               {/* Guests */}
               <div className="space-y-2">
                 <label className="text-xs tracking-wider text-slate-400 uppercase">Guests</label>
                 <div className="relative">
-                  <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                   <select name="guests" value={formData.guests} onChange={handleChange} className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-gold-500 transition-colors appearance-none cursor-pointer">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                       <option key={num} value={num}>{num} {num === 1 ? 'Guest' : 'Guests'}</option>
