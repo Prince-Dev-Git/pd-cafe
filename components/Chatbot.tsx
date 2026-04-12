@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Sparkles } from 'lucide-react';
-import { useStore } from '@/store/useStore';
 import { useChatbot } from '@/services/useChatbot';
 
 export default function Chatbot() {
@@ -11,11 +10,13 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { cart } = useStore();
-  const { messages, sendMessage, isTyping } = useChatbot(cart);
+  // Notice we completely removed useStore here! The Brain handles it now.
+  const { messages, sendMessage, isTyping } = useChatbot();
 
+  // Hydration Fix
   useEffect(() => { setIsMounted(true); }, []);
 
+  // Auto-scroll to the newest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping, isOpen]);
