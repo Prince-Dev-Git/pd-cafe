@@ -11,14 +11,11 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Bring in the global cart and feed it to our AI hook
   const { cart } = useStore();
   const { messages, sendMessage, isTyping } = useChatbot(cart);
 
-  // Hydration Fix
   useEffect(() => { setIsMounted(true); }, []);
 
-  // Auto-scroll to the newest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping, isOpen]);
@@ -31,13 +28,18 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[50]">
-      
+    <>
       {/* The Floating Bubble */}
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
-          className="bg-gold-500 text-slate-900 p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 hover:scale-105 transition-all duration-300 flex items-center justify-center"
+          style={{
+            position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
+            backgroundColor: '#d4af37', color: '#0f172a', padding: '16px',
+            borderRadius: '50%', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 10px 15px -3px rgba(212, 175, 55, 0.4)'
+          }}
         >
           <MessageSquare size={28} />
         </button>
@@ -45,28 +47,38 @@ export default function Chatbot() {
 
       {/* The Chat Window */}
       {isOpen && (
-        <div className="w-[350px] h-[500px] bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+        <div style={{
+          position: 'fixed', bottom: '90px', right: '24px', zIndex: 10000,
+          width: '350px', height: '500px', backgroundColor: '#1e293b',
+          border: '1px solid #334155', borderRadius: '16px',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        }}>
           
           {/* Luxury Header */}
-          <div className="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center">
-            <div className="flex items-center gap-2 text-gold-500">
+          <div style={{ backgroundColor: '#0f172a', padding: '16px', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37' }}>
               <Sparkles size={18} />
-              <span className="font-serif font-bold tracking-widest uppercase">The Concierge</span>
+              <span style={{ fontFamily: 'serif', fontWeight: 'bold', letterSpacing: '0.1em', textTransform: 'uppercase' }}>The Concierge</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-gold-500 transition-colors">
+            <button onClick={() => setIsOpen(false)} style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer' }}>
               <X size={20} />
             </button>
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide bg-slate-800/50">
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: 'rgba(30, 41, 59, 0.5)' }}>
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-3 text-sm leading-relaxed ${
-                  msg.sender === 'user' 
-                    ? 'bg-gold-500 text-slate-900 rounded-2xl rounded-tr-sm font-medium' 
-                    : 'bg-slate-700 text-slate-100 rounded-2xl rounded-tl-sm border border-slate-600'
-                }`}>
+              <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                <div style={{
+                  maxWidth: '80%', padding: '12px', fontSize: '14px', lineHeight: '1.5',
+                  backgroundColor: msg.sender === 'user' ? '#d4af37' : '#334155',
+                  color: msg.sender === 'user' ? '#0f172a' : '#f1f5f9',
+                  borderRadius: '16px',
+                  borderTopRightRadius: msg.sender === 'user' ? '4px' : '16px',
+                  borderTopLeftRadius: msg.sender === 'user' ? '16px' : '4px',
+                  fontWeight: msg.sender === 'user' ? 500 : 400
+                }}>
                   {msg.text}
                 </div>
               </div>
@@ -74,11 +86,9 @@ export default function Chatbot() {
             
             {/* Typing Indicator */}
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-slate-700 text-slate-100 p-4 rounded-2xl rounded-tl-sm border border-slate-600 flex gap-1 items-center">
-                  <div className="w-2 h-2 bg-gold-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-gold-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-gold-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{ backgroundColor: '#334155', color: '#f1f5f9', padding: '16px', borderRadius: '16px', borderTopLeftRadius: '4px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', color: '#d4af37' }}>Processing...</span>
                 </div>
               </div>
             )}
@@ -86,20 +96,20 @@ export default function Chatbot() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-slate-900 border-t border-slate-700">
-            <div className="flex items-center gap-2 bg-slate-800 rounded-full px-4 py-2 border border-slate-700 focus-within:border-gold-500 transition-colors">
+          <div style={{ padding: '16px', backgroundColor: '#0f172a', borderTop: '1px solid #334155' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#1e293b', borderRadius: '9999px', padding: '8px 16px', border: '1px solid #334155' }}>
               <input 
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Ask the Concierge..."
-                className="flex-1 bg-transparent text-slate-100 text-sm focus:outline-none placeholder:text-slate-500"
+                style={{ flex: 1, backgroundColor: 'transparent', color: '#f1f5f9', fontSize: '14px', border: 'none', outline: 'none' }}
               />
               <button 
                 onClick={handleSend}
                 disabled={!input.trim()}
-                className="text-gold-500 hover:text-gold-400 disabled:opacity-50 disabled:hover:text-gold-500 transition-colors"
+                style={{ color: input.trim() ? '#d4af37' : '#475569', background: 'transparent', border: 'none', cursor: input.trim() ? 'pointer' : 'default', display: 'flex' }}
               >
                 <Send size={18} />
               </button>
@@ -108,6 +118,6 @@ export default function Chatbot() {
 
         </div>
       )}
-    </div>
+    </>
   );
 }
