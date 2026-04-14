@@ -14,6 +14,7 @@ interface AppState {
   addToCart: (item: Omit<CartItem, 'quantity'>) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, action: 'increment' | 'decrement') => void;
+  clearCart: () => void; // <-- ADDED THIS LINE
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -29,12 +30,10 @@ export const useStore = create<AppState>((set) => ({
         cart: state.cart.map((c) => 
           c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
         )
-        // isCartOpen removed from here
       };
     }
     return { 
       cart: [...state.cart, { ...item, quantity: 1 }]
-      // isCartOpen removed from here
     };
   }),
 
@@ -51,4 +50,6 @@ export const useStore = create<AppState>((set) => ({
       return c;
     })
   })),
+
+  clearCart: () => set({ cart: [] }), // <-- ADDED THIS LINE
 }));
