@@ -8,6 +8,10 @@ html {
   --color-luxury-gold: #d4af37;
   --color-luxury-slate: #1e293b;
   --color-luxury-accent: #f1f5f9;
+/* Adding these so our components instantly recognize the gold classes */
+  --color-gold-400: #e4c554;
+  --color-gold-500: #d4af37;
+
 }
 
 :root {
