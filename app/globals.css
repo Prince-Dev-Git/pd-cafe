@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem; /* This creates an invisible buffer so the Navbar doesn't cover your section titles */
+}
 @import "tailwindcss";
 
 @theme {
