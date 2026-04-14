@@ -18,9 +18,9 @@ export default function Home() {
     <main className="bg-slate-900 min-h-screen text-slate-100 font-sans selection:bg-gold-500/30">
       <Navbar />
       <Hero />
-      <About />
+      <About /> 
       <Menu />
-      <About />
+      <Reviews />
       <Contact />
       <Chatbot />
       <CartDrawer />
